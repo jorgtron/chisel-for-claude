@@ -1,0 +1,32 @@
+{
+  "name": "chisel-for-claude",
+  "version": "1.0.0",
+  "description": "Visually select any element on a webpage and send design instructions to Claude Code",
+  "bin": {
+    "chisel": "./bin/cli.js"
+  },
+  "main": "lib/server.js",
+  "files": [
+    "bin/",
+    "lib/",
+    "hooks/",
+    "extension/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "ui",
+    "design",
+    "annotation",
+    "chrome-extension",
+    "voice"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jorgtron/chisel-for-claude"
+  }
+}

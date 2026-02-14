@@ -1,0 +1,503 @@
+/* Chisel for Claude - Content Styles */
+
+/* ── Overlay for highlighting elements ──────────────────────────── */
+
+#chisel-overlay {
+  position: absolute;
+  pointer-events: none;
+  border: 2px solid #F7931A;
+  background: rgba(247, 147, 26, 0.08);
+  border-radius: 3px;
+  z-index: 2147483646;
+  display: none;
+  transition: all 0.1s ease;
+}
+
+#chisel-tooltip {
+  position: absolute;
+  background: #111;
+  color: #ccc;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: system-ui, -apple-system, sans-serif;
+  z-index: 2147483646;
+  display: none;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
+}
+
+/* ── Voice panel container ──────────────────────────────────────── */
+
+#chisel-voice-panel {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  width: 360px;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  z-index: 2147483647;
+  font-family: system-ui, -apple-system, sans-serif;
+  display: none;
+  overflow: hidden;
+}
+
+#chisel-voice-panel.visible {
+  display: block;
+  animation: chiselSlideIn 0.2s ease;
+}
+
+@keyframes chiselSlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+
+.chisel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: #222;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.chisel-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chisel-logo {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.chisel-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: #e0e0e0;
+  letter-spacing: 0.02em;
+}
+
+.chisel-close {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.15s;
+  line-height: 1;
+  padding: 2px;
+}
+
+.chisel-close:hover {
+  color: #ccc;
+}
+
+/* ── Element info ───────────────────────────────────────────────── */
+
+.chisel-element-info {
+  padding: 10px 14px;
+  background: #1a1a1a;
+  font-size: 11px;
+  color: #888;
+  border-bottom: 1px solid #262626;
+  line-height: 1.5;
+}
+
+.chisel-element-info strong {
+  color: #aaa;
+  font-weight: 500;
+}
+
+.chisel-element-info code {
+  background: #111;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: 'SF Mono', Consolas, monospace;
+  font-size: 10px;
+  color: #bbb;
+  border: 1px solid #2a2a2a;
+}
+
+.chisel-element-placeholder {
+  color: #555;
+  font-style: italic;
+  font-size: 12px;
+}
+
+/* ── Settings panel ─────────────────────────────────────────────── */
+
+.chisel-settings {
+  padding: 10px 14px;
+  background: #1e1e1e;
+  border-bottom: 1px solid #262626;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chisel-settings-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Toggle switch */
+.chisel-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.chisel-toggle-input {
+  display: none;
+}
+
+.chisel-toggle-slider {
+  width: 30px;
+  height: 16px;
+  background: #333;
+  border-radius: 8px;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.chisel-toggle-slider::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  background: #666;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.chisel-toggle-input:checked + .chisel-toggle-slider {
+  background: #555;
+}
+
+.chisel-toggle-input:checked + .chisel-toggle-slider::after {
+  left: 16px;
+  background: #fff;
+}
+
+.chisel-toggle-label {
+  font-size: 11px;
+  color: #888;
+  white-space: nowrap;
+}
+
+/* Phrase inputs */
+.chisel-phrase-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.chisel-phrase-label {
+  font-size: 10px;
+  color: #555;
+  white-space: nowrap;
+}
+
+.chisel-phrase-input {
+  width: 100%;
+  padding: 3px 6px;
+  background: #151515;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #bbb;
+  font-size: 11px;
+  font-family: 'SF Mono', Consolas, monospace;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.chisel-phrase-input:focus {
+  border-color: #555;
+}
+
+/* Language select */
+.chisel-language-select {
+  flex: 1;
+  padding: 3px 6px;
+  background: #151515;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #bbb;
+  font-size: 11px;
+  font-family: system-ui, -apple-system, sans-serif;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.chisel-language-select:focus {
+  border-color: #555;
+}
+
+.chisel-language-select option {
+  background: #1a1a1a;
+  color: #bbb;
+}
+
+/* Viewport segmented control */
+.chisel-viewport-label {
+  font-size: 11px;
+  color: #888;
+  white-space: nowrap;
+}
+
+.chisel-segmented {
+  display: flex;
+  background: #151515;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid #2a2a2a;
+  flex: 1;
+}
+
+.chisel-seg-btn {
+  flex: 1;
+  padding: 4px 0;
+  background: transparent;
+  border: none;
+  color: #666;
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.chisel-seg-btn:not(:last-child) {
+  border-right: 1px solid #2a2a2a;
+}
+
+.chisel-seg-btn:hover {
+  color: #bbb;
+  background: #222;
+}
+
+.chisel-seg-btn.active {
+  background: #333;
+  color: #eee;
+}
+
+/* ── Voice status ───────────────────────────────────────────────── */
+
+.chisel-voice-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #1a1a1a;
+}
+
+.chisel-mic-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #252525;
+  border-radius: 50%;
+  color: #666;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.chisel-mic-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.chisel-mic-icon.recording {
+  background: #F7931A;
+  color: #fff;
+  animation: chiselPulse 1.5s infinite;
+}
+
+@keyframes chiselPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(247, 147, 26, 0.3); }
+  50%      { box-shadow: 0 0 0 10px rgba(247, 147, 26, 0); }
+}
+
+.chisel-status-text {
+  font-size: 12px;
+  color: #666;
+}
+
+/* ── Transcript ─────────────────────────────────────────────────── */
+
+.chisel-transcript {
+  width: 100%;
+  min-height: 72px;
+  padding: 10px 14px;
+  border: none;
+  background: #111;
+  color: #ddd;
+  font-size: 13px;
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  resize: vertical;
+  box-sizing: border-box;
+  border-top: 1px solid #222;
+  border-bottom: 1px solid #222;
+}
+
+.chisel-transcript:focus {
+  outline: none;
+  background: #141414;
+}
+
+.chisel-transcript::placeholder {
+  color: #444;
+}
+
+/* ── Action buttons ─────────────────────────────────────────────── */
+
+.chisel-actions {
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
+  background: #1a1a1a;
+}
+
+.chisel-btn {
+  padding: 7px 14px;
+  border: none;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.chisel-btn-mic {
+  background: #2a2a2a;
+  color: #bbb;
+  flex: 1;
+}
+
+.chisel-btn-mic:hover {
+  background: #333;
+  color: #eee;
+}
+
+.chisel-btn-mic.recording {
+  background: #c0392b;
+  color: #fff;
+}
+
+.chisel-btn-send {
+  background: #F7931A;
+  color: #fff;
+  flex: 2;
+}
+
+.chisel-btn-send:hover:not(:disabled) {
+  background: #e67e00;
+}
+
+.chisel-btn-send:disabled {
+  background: #333;
+  color: #555;
+  cursor: not-allowed;
+}
+
+.chisel-btn-cancel {
+  background: transparent;
+  color: #666;
+  border: 1px solid #333;
+}
+
+.chisel-btn-cancel:hover {
+  background: #222;
+  color: #bbb;
+}
+
+/* ── Notification ───────────────────────────────────────────────── */
+
+.chisel-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 10px 16px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #ccc;
+  font-size: 13px;
+  font-family: system-ui, -apple-system, sans-serif;
+  z-index: 2147483647;
+  animation: chiselNotifIn 0.25s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.chisel-notification.error {
+  border-color: #c0392b;
+  color: #e88;
+}
+
+.chisel-notification.success {
+  border-color: #555;
+}
+
+@keyframes chiselNotifIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Activity log ───────────────────────────────────────────────── */
+
+.chisel-log {
+  max-height: 80px;
+  overflow-y: auto;
+  padding: 6px 10px;
+  background: #111;
+  font-family: 'SF Mono', Consolas, monospace;
+  font-size: 9px;
+  line-height: 1.6;
+  border-top: 1px solid #222;
+}
+
+.chisel-log-entry {
+  color: #444;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chisel-log-ok {
+  color: #6a6;
+}
+
+.chisel-log-warn {
+  color: #a93;
+}
+
+.chisel-log-error {
+  color: #a55;
+}
+
+/* ── Cursor change when in annotation mode ──────────────────────── */
+
+body.chisel-active * {
+  cursor: crosshair !important;
+}

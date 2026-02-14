@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chisel for Claude — Point. Speak. Ship.</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e0e0e;
+      --bg-raised: #141414;
+      --bg-surface: #1a1a1a;
+      --bg-surface-2: #222;
+      --border: #1e1e1e;
+      --border-light: #2a2a2a;
+      --border-hover: #333;
+      --text: #e0e0e0;
+      --text-secondary: #aaa;
+      --text-dim: #888;
+      --text-dimmer: #555;
+      --text-muted: #444;
+      --accent: #ccc;
+      --white: #fff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── Nav ──────────────────────────────────────── */
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 40px;
+      background: rgba(14, 14, 14, 0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-brand img {
+      width: 26px;
+      height: 26px;
+      border-radius: 5px;
+      object-fit: contain;
+    }
+
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--bg-surface-2);
+      color: var(--text);
+      padding: 7px 18px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid var(--border-light);
+      transition: all 0.2s;
+    }
+    .nav-cta:hover { border-color: var(--border-hover); background: var(--border-light); }
+
+    /* ── Hero ─────────────────────────────────────── */
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 900px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.03) 35%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 16px;
+      margin-bottom: 32px;
+      object-fit: contain;
+    }
+
+    h1 {
+      font-size: clamp(44px, 6vw, 72px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+      color: var(--white);
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      color: var(--text-dim);
+      max-width: 520px;
+      margin-bottom: 44px;
+      line-height: 1.65;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: var(--white);
+      color: #000;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: #ddd; transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      border: 1px solid var(--border-light);
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--border-hover); background: var(--bg-raised); }
+
+    .hero-install {
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-raised);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .hero-install:hover { border-color: var(--border-hover); }
+    .hero-install code { color: var(--text-secondary); }
+    .hero-install .copy-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: system-ui, sans-serif;
+    }
+
+    /* ── Sections ─────────────────────────────────── */
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dimmer);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      color: var(--white);
+    }
+
+    .section-sub {
+      color: var(--text-dim);
+      font-size: 16px;
+      max-width: 500px;
+      margin: 0 auto 44px;
+    }
+
+    /* ── Flow / How it works ──────────────────────── */
+
+    .flow-section {
+      padding: 80px 24px;
+      text-align: center;
+    }
+
+    .flow {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      gap: 0;
+      max-width: 840px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+    }
+
+    .flow-step {
+      flex: 1;
+      min-width: 180px;
+      padding: 28px 24px;
+      position: relative;
+    }
+
+    .flow-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 48px;
+      right: -8px;
+      width: 16px;
+      height: 1px;
+      background: var(--border-hover);
+    }
+
+    .flow-num {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 14px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .flow-step h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .flow-step p {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.55;
+    }
+
+    /* ── Demo section ─────────────────────────────── */
+
+    .demo-section {
+      padding: 80px 24px 100px;
+    }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      max-width: 1060px;
+      margin: 0 auto;
+    }
+
+    .comparison-side { position: relative; overflow: visible; min-width: 0; }
+
+    .demo-side-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+      padding-left: 2px;
+      color: var(--text-dimmer);
+    }
+
+    .demo-side-label .dot {
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    .demo-side-label .dot.dim { background: var(--text-dimmer); }
+    .demo-side-label .dot.bright { background: var(--text-secondary); }
+
+    /* ── Terminal ──────────────────────────────────── */
+
+    .terminal {
+      background: #0c0c0c;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      overflow: hidden;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 14px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .win-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border-light);
+    }
+
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: system-ui, sans-serif;
+    }
+
+    .terminal-body {
+      padding: 14px 16px;
+      min-height: 310px;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    .term-line {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .term-line .prompt { color: var(--text-dimmer); }
+    .term-line .cmd { color: var(--text-secondary); }
+    .term-line .comment { color: var(--text-muted); font-style: italic; }
+    .term-line .output { color: var(--text-dim); }
+    .term-line .claude-label { color: var(--text-dimmer); font-weight: 600; }
+    .term-line .claude-text { color: var(--text-dim); }
+    .term-line .claude-file { color: var(--text-secondary); }
+    .term-line .claude-check { color: #6a6; }
+    .term-line .cursor {
+      display: inline-block;
+      width: 7px;
+      height: 14px;
+      background: var(--text-dim);
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── Browser mockup ───────────────────────────── */
+
+    .browser-mock {
+      background: #0c0c0c;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .browser-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 14px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .browser-dots { display: flex; gap: 5px; }
+
+    .browser-url {
+      flex: 1;
+      background: #111;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: system-ui, sans-serif;
+      border: 1px solid var(--border);
+    }
+
+    .browser-body {
+      padding: 20px;
+      min-height: 310px;
+      position: relative;
+    }
+
+    /* ── Fake page ────────────────────────────────── */
+
+    .fake-page { pointer-events: none; }
+
+    .fake-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .fake-logo { font-weight: 700; font-size: 14px; color: var(--text-secondary); }
+
+    .fake-nav-links { display: flex; gap: 14px; }
+    .fake-nav-link { font-size: 11px; color: var(--text-dimmer); }
+
+    .fake-hero-text { margin-bottom: 14px; }
+    .fake-hero-text h4 { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+    .fake-hero-text p { font-size: 11px; color: var(--text-dim); line-height: 1.5; }
+
+    .fake-button {
+      display: inline-block;
+      padding: 7px 18px;
+      background: var(--bg-surface-2);
+      border: 1px solid var(--border-light);
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .fake-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .fake-card {
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 10px;
+    }
+
+    .fake-card-bar { height: 5px; background: var(--border-light); border-radius: 3px; margin-bottom: 7px; width: 55%; }
+    .fake-card-line { height: 3px; background: var(--border); border-radius: 2px; margin-bottom: 5px; }
+    .fake-card-line:last-child { width: 70%; margin-bottom: 0; }
+
+    /* ── Chisel sim ────────────────────────────────── */
+
+    .chisel-sim-highlight {
+      position: absolute;
+      border: 2px solid #F7931A;
+      background: rgba(247, 147, 26, 0.08);
+      border-radius: 4px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .chisel-sim-highlight.visible { opacity: 1; }
+
+    .chisel-sim-panel {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 190px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      overflow: hidden;
+      font-family: system-ui, sans-serif;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: all 0.25s;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .chisel-sim-panel.visible { opacity: 1; transform: translateY(0); }
+
+    .chisel-sim-header {
+      padding: 5px 8px;
+      background: var(--bg-surface-2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .chisel-sim-header img { width: 14px; height: 14px; border-radius: 3px; }
+    .chisel-sim-header span { font-size: 10px; font-weight: 600; color: var(--text-dim); }
+
+    .chisel-sim-body { padding: 7px 8px; }
+
+    .chisel-sim-selected { font-size: 9px; color: var(--text-muted); margin-bottom: 5px; }
+    .chisel-sim-selected code {
+      background: #111;
+      padding: 1px 3px;
+      border-radius: 2px;
+      font-size: 9px;
+      color: var(--text-dimmer);
+    }
+
+    .chisel-sim-mic {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+    .chisel-sim-mic-icon {
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #F7931A;
+      border-radius: 50%;
+      color: #fff;
+      flex-shrink: 0;
+      animation: pulse 1.5s infinite;
+    }
+    .chisel-sim-mic-icon svg { width: 11px; height: 11px; }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(247, 147, 26, 0.3); }
+      50% { box-shadow: 0 0 0 5px rgba(247, 147, 26, 0); }
+    }
+    .chisel-sim-mic span { font-size: 9px; color: var(--text-dim); }
+
+    .chisel-sim-transcript {
+      background: #111;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 5px 6px;
+      font-size: 9.5px;
+      color: var(--text-secondary);
+      min-height: 28px;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .chisel-sim-send {
+      display: block;
+      width: 100%;
+      padding: 5px;
+      background: var(--white);
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: default;
+    }
+
+    /* ── Time bar ──────────────────────────────────── */
+
+    .time-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .time-bar-track {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .time-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 1.5s ease;
+    }
+    .time-bar-fill.slow { background: var(--text-dimmer); }
+    .time-bar-fill.fast { background: var(--text-secondary); }
+
+    .time-label {
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      color: var(--text-dim);
+    }
+
+    /* ── Thought bubble ─────────────────────────────── */
+
+    .thought-bubble {
+      position: absolute;
+      top: 18px;
+      left: 16px;
+      right: 16px;
+      background: var(--bg-surface-2);
+      border: 1px solid var(--border-hover);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-style: italic;
+      color: var(--text-dim);
+      z-index: 10;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.3s, transform 0.3s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      pointer-events: none;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .thought-bubble.visible { opacity: 1; transform: translateY(0); }
+
+    .term-typing-wrap {
+      white-space: pre-wrap !important;
+      word-break: break-all;
+      overflow-wrap: break-word;
+    }
+
+    /* ── Play overlay ─────────────────────────────── */
+
+    .demo-play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.45);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+      z-index: 5;
+    }
+    .demo-play-overlay:hover { background: rgba(0, 0, 0, 0.35); }
+
+    .play-btn {
+      width: 48px;
+      height: 48px;
+      background: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      transition: transform 0.2s;
+    }
+    .demo-play-overlay:hover .play-btn { transform: scale(1.06); }
+    .play-btn svg { width: 18px; height: 18px; fill: #000; margin-left: 2px; }
+
+    /* ── Architecture ──────────────────────────────── */
+
+    .arch-section { padding: 60px 24px 80px; }
+
+    .arch-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 28px 20px;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .arch-node {
+      padding: 10px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      font-family: 'SF Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+    .arch-node.highlight {
+      border-color: var(--border-hover);
+      color: var(--text);
+      background: var(--bg-surface);
+    }
+
+    .arch-arrow { color: var(--text-muted); font-size: 16px; }
+
+    .arch-desc {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .arch-desc-item {
+      font-size: 11px;
+      color: var(--text-dimmer);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .arch-desc-item .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--text-dimmer); }
+
+    /* ── Features ──────────────────────────────────── */
+
+    .features-section { padding: 80px 24px; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .feature-card {
+      padding: 24px 20px;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: border-color 0.2s;
+    }
+    .feature-card:hover { border-color: var(--border-light); }
+
+    .feature-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      font-size: 16px;
+      color: var(--text-dim);
+    }
+
+    .feature-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+    .feature-card p { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+
+    /* ── Install ───────────────────────────────────── */
+
+    .install-section {
+      padding: 80px 24px 100px;
+      text-align: center;
+    }
+
+    .install-steps {
+      max-width: 560px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .install-step {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .step-num {
+      width: 26px;
+      height: 26px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      color: var(--text-dim);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+    .step-content p { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+    .step-content code { color: var(--text-dimmer); font-size: 12px; }
+
+    .step-code {
+      background: #111;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-family: 'SF Mono', monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      position: relative;
+    }
+    .step-code:hover { border-color: var(--border-hover); }
+    .step-code[data-copied]::after { content: 'Copied!'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #6c6; font-family: system-ui, sans-serif; }
+
+    /* ── Footer ────────────────────────────────────── */
+
+    footer {
+      padding: 36px 24px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+    footer a { color: var(--text-dimmer); text-decoration: none; }
+    footer a:hover { color: var(--text-dim); }
+
+    /* ── Hero interactive demo ─────────────────────── */
+
+    .hero-h1-wrap {
+      position: relative;
+      display: inline-block;
+    }
+
+    #hero-headline {
+      transition: opacity 0.3s;
+    }
+
+    /* Highlight ring around headline */
+    .hero-highlight {
+      position: absolute;
+      inset: 11px -14px;
+      border: 2px solid #F7931A;
+      background: rgba(247, 147, 26, 0.06);
+      border-radius: 8px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.35s;
+    }
+    .hero-highlight.visible { opacity: 1; }
+
+    /* Fake cursor */
+    .hero-cursor {
+      position: absolute;
+      width: 20px;
+      height: 24px;
+      pointer-events: none;
+      z-index: 20;
+      opacity: 0;
+      transition: opacity 0.3s;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
+    .hero-cursor.visible { opacity: 1; }
+
+    /* Chisel floating panel in hero */
+    .hero-panel {
+      position: absolute;
+      z-index: 15;
+      width: 260px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      overflow: hidden;
+      font-family: system-ui, sans-serif;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.3s;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03);
+      pointer-events: none;
+    }
+    .hero-panel.visible { opacity: 1; transform: translateY(0); }
+
+    .hero-panel-header {
+      padding: 7px 10px;
+      background: var(--bg-surface-2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hero-panel-header img { width: 16px; height: 16px; border-radius: 3px; }
+    .hero-panel-header span { font-size: 11px; font-weight: 600; color: var(--text-dim); }
+
+    .hero-panel-body { padding: 8px 10px; }
+
+    .hero-panel-el {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .hero-panel-el code {
+      background: #111;
+      padding: 1px 4px;
+      border-radius: 2px;
+      font-size: 10px;
+      color: var(--text-dimmer);
+    }
+
+    .hero-panel-mic {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+    }
+    .hero-panel-mic-icon {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #F7931A;
+      border-radius: 50%;
+      color: #fff;
+      flex-shrink: 0;
+      animation: mic-pulse 1.5s infinite;
+    }
+    .hero-panel-mic-icon svg { width: 14px; height: 14px; }
+    @keyframes mic-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(247, 147, 26, 0.35); }
+      50% { box-shadow: 0 0 0 8px rgba(247, 147, 26, 0); }
+    }
+    .hero-panel-mic span { font-size: 10px; color: var(--text-dim); }
+
+    .hero-panel-transcript {
+      background: #111;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      min-height: 34px;
+      margin-bottom: 8px;
+      line-height: 1.45;
+    }
+
+    .hero-panel-send {
+      display: block;
+      width: 100%;
+      padding: 6px;
+      background: var(--white);
+      color: #000;
+      border: none;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: default;
+      transition: all 0.2s;
+    }
+
+    .hero-panel-status {
+      padding: 6px 10px;
+      border-top: 1px solid var(--border);
+      font-size: 9px;
+      color: var(--text-muted);
+      font-family: 'SF Mono', monospace;
+    }
+
+    /* Headline morph shimmer */
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .headline-shimmer {
+      background: linear-gradient(90deg, var(--white) 40%, var(--text-dim) 50%, var(--white) 60%);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 1.2s ease forwards;
+    }
+
+    /* Responsive ────────────────────────────────── */
+
+    @media (max-width: 768px) {
+      nav { padding: 12px 20px; }
+      .nav-links { display: none; }
+      .comparison { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .flow { flex-direction: column; align-items: center; }
+      .flow-step:not(:last-child)::after { display: none; }
+      h1 { font-size: 32px; }
+      h2 { font-size: 26px; }
+      .hero { overflow: hidden; }
+      .hero-highlight { inset: 2px -10px; }
+      .hero-panel { width: 220px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ──────────────────────────────────────── -->
+<nav>
+  <a href="#" class="nav-brand">
+    <img src="chisel-logo.png" alt="Chisel">
+    Chisel for Claude
+  </a>
+  <div class="nav-links">
+    <a href="#demo">Demo</a>
+    <a href="#how-it-works">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#install">Install</a>
+  </div>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <a href="https://github.com/jorgtron/chisel-for-claude" target="_blank" rel="noopener" class="nav-cta" style="display:flex; align-items:center; gap:6px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      GitHub
+    </a>
+    <a href="#install" class="nav-cta">Get Started</a>
+  </div>
+</nav>
+
+<!-- ── Hero ─────────────────────────────────────── -->
+<section class="hero" id="hero">
+  <img src="chisel-logo.png" alt="Chisel" class="hero-logo">
+  <div class="hero-h1-wrap">
+    <h1 id="hero-headline">Point. Speak. Ship.</h1>
+    <div class="hero-highlight" id="hero-hl"></div>
+  </div>
+  <p class="hero-sub">
+    Click any element in your web app, say what you want changed, and watch Chisel for Claude make it happen. No more describing URLs, element order, or page structure from memory.
+  </p>
+  <div class="hero-actions" style="display:none;">
+    <a href="#install" class="btn-primary">Get Started</a>
+  </div>
+  <p style="color: var(--text-dim); font-size: 13px; margin-top: 36px; margin-bottom: 8px;">Paste this in your terminal to install:</p>
+  <div class="hero-install" onclick="navigator.clipboard.writeText('curl -fsSL https://raw.githubusercontent.com/jorgtron/chisel-for-claude/main/install.sh | bash');">
+    <code>curl -fsSL https://raw.githubusercontent.com/jorgtron/chisel-for-claude/main/install.sh | bash</code>
+    <span class="copy-hint">click to copy</span>
+  </div>
+  <p style="color: var(--text-dimmer); font-size: 12px; margin-top: 10px;">Works on macOS, Linux, and Windows (WSL). Requires Node.js 18+, Chrome, and Claude Code.</p>
+
+  <!-- Interactive demo overlays -->
+  <svg class="hero-cursor" id="hero-cursor" viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5.5 1L7.5 23L11.5 17L18.5 18L5.5 1Z" fill="white" stroke="#222" stroke-width="1.5" stroke-linejoin="round"/>
+  </svg>
+
+  <div class="hero-panel" id="hero-panel">
+    <div class="hero-panel-header">
+      <img src="chisel-logo.png" alt="">
+      <span>Chisel</span>
+    </div>
+    <div class="hero-panel-body">
+      <div class="hero-panel-el">
+        Selected: <code>&lt;h1&gt;</code> &mdash; "Point. Speak. Ship."
+      </div>
+      <div class="hero-panel-mic" id="hero-mic">
+        <div class="hero-panel-mic-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+        </div>
+        <span>Listening...</span>
+      </div>
+      <div class="hero-panel-transcript" id="hero-transcript"></div>
+      <button class="hero-panel-send" id="hero-send">Send to Claude</button>
+    </div>
+    <div class="hero-panel-status" id="hero-status"></div>
+  </div>
+</section>
+
+<!-- ── Demo ─────────────────────────────────────── -->
+<section class="demo-section" id="demo">
+  <div style="max-width:1060px; margin:0 auto;">
+    <p class="section-label" style="text-align:center">Before &amp; After</p>
+    <h2 style="text-align:center">2X faster workflow</h2>
+    <p class="section-sub" style="text-align:center; margin:0 auto 36px;">Same task. Click play to watch each approach.</p>
+
+    <div class="comparison">
+      <!-- BEFORE -->
+      <div class="comparison-side">
+        <div class="demo-side-label">
+          <span class="dot dim"></span> Before — Terminal only
+        </div>
+        <div id="before-thought" class="thought-bubble"></div>
+        <div class="terminal" style="position:relative">
+          <div class="terminal-bar">
+            <div class="win-dot"></div>
+            <div class="win-dot"></div>
+            <div class="win-dot"></div>
+            <div class="terminal-title">Terminal — Claude Code</div>
+          </div>
+          <div class="terminal-body" id="before-terminal">
+            <div class="term-line"><span class="prompt">$ </span><span class="cmd">claude</span></div>
+            <div class="term-line"><span class="output"> </span></div>
+            <div class="term-line"><span class="output">Claude Code v1.0</span></div>
+            <div class="term-line"><span class="output"> </span></div>
+            <div class="term-line"><span class="prompt">&gt; </span><span class="cursor"></span></div>
+          </div>
+          <div class="demo-play-overlay" id="before-play">
+            <div class="play-btn">
+              <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="time-bar">
+          <span class="time-label" id="before-timer">0.0s</span>
+          <div class="time-bar-track">
+            <div class="time-bar-fill slow" id="before-time" style="width:0"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AFTER -->
+      <div class="comparison-side">
+        <div class="demo-side-label">
+          <span class="dot bright"></span> After — With Chisel
+        </div>
+        <div class="browser-mock" style="position:relative">
+          <div class="browser-bar">
+            <div class="browser-dots">
+              <div class="win-dot"></div>
+              <div class="win-dot"></div>
+              <div class="win-dot"></div>
+            </div>
+            <div class="browser-url">localhost:3000/dashboard</div>
+          </div>
+          <div class="browser-body" id="after-browser">
+            <div class="fake-page">
+              <div class="fake-nav">
+                <div class="fake-logo">Acme Co</div>
+                <div class="fake-nav-links">
+                  <span class="fake-nav-link">Products</span>
+                  <span class="fake-nav-link">Pricing</span>
+                  <span class="fake-nav-link">About</span>
+                </div>
+              </div>
+              <div class="fake-hero-text">
+                <h4>Welcome to Acme</h4>
+                <p>Building the future of web development with AI-powered tools.</p>
+              </div>
+              <div class="fake-button" id="fake-cta-btn">Get Started</div>
+              <div class="fake-cards">
+                <div class="fake-card">
+                  <div class="fake-card-bar"></div>
+                  <div class="fake-card-line"></div>
+                  <div class="fake-card-line"></div>
+                </div>
+                <div class="fake-card">
+                  <div class="fake-card-bar"></div>
+                  <div class="fake-card-line"></div>
+                  <div class="fake-card-line"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="chisel-sim-highlight" id="chisel-highlight"></div>
+            <svg class="after-cursor" id="after-cursor" viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:20px;height:24px;pointer-events:none;z-index:10;opacity:0;transition:opacity 0.3s;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
+              <path d="M5.5 1L7.5 23L11.5 17L18.5 18L5.5 1Z" fill="white" stroke="#222" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+
+            <div class="chisel-sim-panel" id="chisel-panel">
+              <div class="chisel-sim-header">
+                <img src="chisel-logo.png" alt="">
+                <span>Chisel</span>
+              </div>
+              <div class="chisel-sim-body">
+                <div class="chisel-sim-selected">
+                  Selected: <code>&lt;div class="fake-button"&gt;</code>
+                </div>
+                <div class="chisel-sim-mic" id="chisel-mic">
+                  <div class="chisel-sim-mic-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg></div>
+                  <span>Listening...</span>
+                </div>
+                <div class="chisel-sim-transcript" id="chisel-transcript"></div>
+                <button class="chisel-sim-send" id="chisel-send">Send to Claude</button>
+              </div>
+            </div>
+          </div>
+          <div class="demo-play-overlay" id="after-play">
+            <div class="play-btn">
+              <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="time-bar">
+          <span class="time-label" id="after-timer">0.0s</span>
+          <div class="time-bar-track">
+            <div class="time-bar-fill fast" id="after-time" style="width:0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How it works ────────────────────────────── -->
+<section class="flow-section" id="how-it-works">
+  <p class="section-label">How it works</p>
+  <h2>Three steps. Zero friction.</h2>
+  <p class="section-sub">Chisel bridges your browser and Claude Code so you can point at what you want changed instead of typing it. Voice input supports 20+ languages.</p>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-num">1</div>
+      <h3>Click</h3>
+      <p>Activate Chisel and click any element. It captures the selector, computed styles, and HTML context automatically.</p>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">2</div>
+      <h3>Speak</h3>
+      <p>Tell Chisel what you want changed using your voice or keyboard. Say "Chisel" when done to send it off.</p>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">3</div>
+      <h3>Ship</h3>
+      <p>The annotated instruction lands directly in your Claude Code session via tmux. Changes appear in seconds.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Architecture ────────────────────────────── -->
+<section class="arch-section" id="architecture">
+  <p class="section-label" style="text-align:center">Architecture</p>
+  <h2 style="text-align:center; margin-bottom:10px;">How it works</h2>
+  <p style="text-align:center; color:var(--text-dim); font-size:15px; max-width:560px; margin:0 auto 28px;">Chisel connects your browser to Claude Code through a lightweight local relay. Point at any element, describe the change, and Claude edits your source files directly.</p>
+
+  <div class="arch-flow">
+    <div class="arch-node highlight">Browser</div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-node">Extension</div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-node">Chisel Server</div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-node">tmux</div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-node highlight">Claude Code</div>
+  </div>
+
+  <div class="arch-desc">
+    <div class="arch-desc-item"><div class="dot"></div> Click + speak in browser</div>
+    <div class="arch-desc-item"><div class="dot"></div> POST instruction to localhost</div>
+    <div class="arch-desc-item"><div class="dot"></div> Writes JSON + sends tmux keys</div>
+    <div class="arch-desc-item"><div class="dot"></div> Claude reads and executes</div>
+  </div>
+</section>
+
+<!-- ── Features ────────────────────────────────── -->
+<section class="features-section" id="features">
+  <p class="section-label" style="text-align:center">Features</p>
+  <h2 style="text-align:center; margin-bottom:36px;">Built for speed</h2>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </div>
+      <h3>Voice Input</h3>
+      <p>Speak your instructions naturally in 20+ languages. Say "Chisel" to send, "cancel" to clear. Hands-free from click to ship.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+      </div>
+      <h3>Auto-Submit</h3>
+      <p>With tmux integration, instructions are sent directly to your Claude Code session. No copy-paste required.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"/></svg>
+      </div>
+      <h3>Smart Selectors</h3>
+      <p>Captures unique CSS selectors, computed styles, bounding rects, and truncated HTML for precise edits.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+      </div>
+      <h3>Viewport Modes</h3>
+      <p>Target desktop, mobile, or both. Auto-detects narrow viewports and adjusts the instruction context.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      </div>
+      <h3>Hook System</h3>
+      <p>Uses Claude Code's native UserPromptSubmit hook. Instructions are injected before every prompt automatically.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h3>Auto-Accept</h3>
+      <p>Permission prompts in Claude Code are auto-accepted. The full loop from voice to deployed change is hands-free.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Install ─────────────────────────────────── -->
+<section class="install-section" id="install">
+  <p class="section-label">Get Started</p>
+  <h2>One command to install</h2>
+  <p class="section-sub" style="margin:0 auto 40px;">Installs the package, sets up hooks, and tells you what to do next.</p>
+
+  <div class="install-steps">
+    <div class="install-step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4>Run the install script</h4>
+        <p>Installs Chisel globally, sets up the Claude Code hook, and prints the extension path.</p>
+        <div class="step-code" onclick="navigator.clipboard.writeText(this.textContent.trim());this.dataset.copied='true';setTimeout(()=>delete this.dataset.copied,1500)">curl -fsSL https://raw.githubusercontent.com/jorgtron/chisel-for-claude/main/install.sh | bash</div>
+      </div>
+    </div>
+    <div class="install-step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>Load the Chrome extension</h4>
+        <p>Open <a href="chrome://extensions" style="color:var(--text-dimmer);">chrome://extensions</a>, enable Developer mode, and load the path shown by the installer as an unpacked extension.</p>
+      </div>
+    </div>
+    <div class="install-step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4>Start chiseling</h4>
+        <div class="step-code" onclick="navigator.clipboard.writeText(this.textContent.trim());this.dataset.copied='true';setTimeout(()=>delete this.dataset.copied,1500)">chisel start</div>
+        <p style="margin-top:6px;">Then click the Chisel extension icon in Chrome and start pointing at elements.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:40px;">
+    <a href="https://github.com/jorgtron/chisel-for-claude" class="btn-primary" style="display:inline-flex;align-items:center;gap:8px;">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+</section>
+
+<!-- ── Footer ──────────────────────────────────── -->
+<footer>
+  <p>Chisel for Claude &mdash; MIT License &mdash; <a href="https://github.com/jorgtron/chisel-for-claude">GitHub</a></p>
+</footer>
+
+<!-- ── Hero interactive demo ────────────────────── -->
+<script>
+(function() {
+  var headline = document.getElementById('hero-headline');
+  var hl = document.getElementById('hero-hl');
+  var cursor = document.getElementById('hero-cursor');
+  var panel = document.getElementById('hero-panel');
+  var transcript = document.getElementById('hero-transcript');
+  var mic = document.getElementById('hero-mic');
+  var sendBtn = document.getElementById('hero-send');
+  var status = document.getElementById('hero-status');
+  var heroSection = document.getElementById('hero');
+
+  var originalText = 'Point. Speak. Ship.';
+  var newText = 'Vibe code. Hands-free.';
+  var voiceInstruction = 'Change this to say "Vibe code. Hands-free."';
+  var LOOP_DELAY = 14000;
+
+  function positionElements() {
+    var hRect = headline.getBoundingClientRect();
+    var sRect = heroSection.getBoundingClientRect();
+
+    // Position panel below-right of headline
+    panel.style.top = (hRect.bottom - sRect.top + 14) + 'px';
+    panel.style.left = (hRect.left - sRect.left + hRect.width * 0.3) + 'px';
+  }
+
+  function moveCursor(x, y, duration) {
+    cursor.style.transition = 'left ' + duration + 'ms ease, top ' + duration + 'ms ease';
+    cursor.style.left = x + 'px';
+    cursor.style.top = y + 'px';
+  }
+
+  function runHeroDemo() {
+    // Reset
+    headline.textContent = originalText;
+    headline.className = '';
+    headline.style.opacity = '1';
+    hl.classList.remove('visible');
+    panel.classList.remove('visible');
+    cursor.classList.remove('visible');
+    transcript.textContent = '';
+    sendBtn.textContent = 'Send to Claude';
+    sendBtn.style.background = '';
+    sendBtn.style.color = '';
+    mic.innerHTML = '<div class="hero-panel-mic-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg></div><span>Listening...</span>';
+    status.textContent = '';
+    positionElements();
+
+    var hRect = headline.getBoundingClientRect();
+    var sRect = heroSection.getBoundingClientRect();
+
+    // Start cursor off-screen right
+    cursor.style.transition = 'none';
+    cursor.style.left = (hRect.right - sRect.left + 120) + 'px';
+    cursor.style.top = (hRect.top - sRect.top + hRect.height * 0.3) + 'px';
+
+    // 0.5s: Cursor fades in
+    setTimeout(function() {
+      cursor.classList.add('visible');
+    }, 500);
+
+    // 0.8s: Cursor moves toward headline center
+    setTimeout(function() {
+      var hr = headline.getBoundingClientRect();
+      var sr = heroSection.getBoundingClientRect();
+      moveCursor(
+        hr.left - sr.left + hr.width * 0.5,
+        hr.top - sr.top + hr.height * 0.4,
+        900
+      );
+    }, 800);
+
+    // 2.0s: Highlight appears around headline (click)
+    setTimeout(function() {
+      hl.classList.add('visible');
+    }, 2000);
+
+    // 2.5s: Panel slides in
+    setTimeout(function() {
+      positionElements();
+      panel.classList.add('visible');
+      // Move cursor down to panel area
+      var hr = headline.getBoundingClientRect();
+      var sr = heroSection.getBoundingClientRect();
+      moveCursor(
+        hr.left - sr.left + hr.width * 0.45,
+        hr.bottom - sr.top + 80,
+        600
+      );
+    }, 2500);
+
+    // 3.0s: Voice transcription word by word
+    setTimeout(function() {
+      var words = voiceInstruction.split(' ');
+      var w = 0;
+      function addWord() {
+        if (w >= words.length) return;
+        transcript.textContent += (w > 0 ? ' ' : '') + words[w];
+        w++;
+        setTimeout(addWord, 200);
+      }
+      addWord();
+    }, 3000);
+
+    // 5.2s: "Send to Claude" button flashes, sent
+    setTimeout(function() {
+      sendBtn.style.background = '#ccc';
+      sendBtn.style.color = '#000';
+      sendBtn.textContent = 'Sent!';
+      mic.innerHTML = '<span style="color:var(--text-secondary);font-size:10px;">&#10003; Delivered</span>';
+      status.textContent = '12:34:01  Sent to tmux session "claude"';
+    }, 5200);
+
+    // 6.0s: Panel fades, cursor fades
+    setTimeout(function() {
+      panel.classList.remove('visible');
+      cursor.classList.remove('visible');
+    }, 6200);
+
+    // 6.8s: Headline shimmer + text morph
+    setTimeout(function() {
+      headline.classList.add('headline-shimmer');
+    }, 6800);
+
+    // 7.4s: Text changes
+    setTimeout(function() {
+      headline.textContent = newText;
+    }, 7400);
+
+    // 8.2s: Remove shimmer, settle
+    setTimeout(function() {
+      headline.classList.remove('headline-shimmer');
+      headline.style.cssText = '';
+    }, 8200);
+
+    // 9.5s: Highlight fades
+    setTimeout(function() {
+      hl.classList.remove('visible');
+    }, 9500);
+
+    // 11.5s: Fade back to original text for loop
+    setTimeout(function() {
+      headline.style.opacity = '0';
+      headline.style.transition = 'opacity 0.4s';
+    }, 11500);
+
+    setTimeout(function() {
+      headline.textContent = originalText;
+      headline.classList.remove('headline-shimmer');
+      headline.style.opacity = '1';
+    }, 12000);
+
+    // Loop
+    setTimeout(runHeroDemo, LOOP_DELAY);
+  }
+
+  // Start after a short delay
+  setTimeout(runHeroDemo, 1500);
+
+  // Reposition on resize
+  window.addEventListener('resize', positionElements);
+})();
+</script>
+
+<!-- ── Demo animations ─────────────────────────── -->
+<script>
+(function() {
+  function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+  // ── BEFORE demo ──
+
+  var beforeTerminal = document.getElementById('before-terminal');
+  var beforePlay = document.getElementById('before-play');
+  var beforeTimeBar = document.getElementById('before-time');
+  var beforeTimer = document.getElementById('before-timer');
+  var beforeThought = document.getElementById('before-thought');
+  var beforeRunning = false;
+
+  function runBeforeDemo() {
+    if (beforeRunning) return;
+    beforeRunning = true;
+    beforePlay.style.display = 'none';
+
+    // Reset terminal
+    beforeTerminal.innerHTML =
+      '<div class="term-line"><span class="prompt">$ </span><span class="cmd">claude</span></div>' +
+      '<div class="term-line"><span class="output"> </span></div>' +
+      '<div class="term-line"><span class="output">Claude Code v1.0</span></div>' +
+      '<div class="term-line"><span class="output"> </span></div>' +
+      '<div class="term-line term-typing-wrap"><span class="prompt">&gt; </span><span class="cmd" id="before-typing"></span><span class="cursor"></span></div>';
+
+    beforeTimeBar.style.transition = 'none';
+    beforeTimeBar.style.width = '0';
+    beforeTimer.textContent = '0.0s';
+    beforeThought.classList.remove('visible');
+    beforeThought.textContent = '';
+
+    var typingEl = document.getElementById('before-typing');
+    var startTime = Date.now();
+    var EXPECTED_DURATION = 30000;
+
+    // Live timer + progress bar
+    var timerInterval = setInterval(function() {
+      var elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+      beforeTimer.textContent = elapsed + 's';
+      var pct = Math.min(100, ((Date.now() - startTime) / EXPECTED_DURATION) * 100);
+      beforeTimeBar.style.width = pct + '%';
+    }, 100);
+
+    function showThought(text) {
+      beforeThought.textContent = text;
+      beforeThought.classList.add('visible');
+    }
+
+    function hideThought() {
+      beforeThought.classList.remove('visible');
+    }
+
+    function typeChars(text, speed) {
+      speed = speed || 42;
+      return new Promise(function(resolve) {
+        var i = 0;
+        function next() {
+          if (i >= text.length) { resolve(); return; }
+          typingEl.textContent += text[i];
+          beforeTerminal.scrollTop = beforeTerminal.scrollHeight;
+          i++;
+          setTimeout(next, speed + Math.random() * 20 - 10);
+        }
+        next();
+      });
+    }
+
+    function backspace(count, speed) {
+      speed = speed || 55;
+      return new Promise(function(resolve) {
+        var i = 0;
+        function next() {
+          if (i >= count) { resolve(); return; }
+          typingEl.textContent = typingEl.textContent.slice(0, -1);
+          i++;
+          setTimeout(next, speed);
+        }
+        next();
+      });
+    }
+
+    function addOutputLine(html) {
+      // Remove cursor from current typing line
+      var cursorEl = beforeTerminal.querySelector('.cursor');
+      var typingLine = beforeTerminal.querySelector('.term-typing-wrap');
+      if (cursorEl) cursorEl.remove();
+      if (typingLine) typingLine.classList.remove('term-typing-wrap');
+
+      var line = document.createElement('div');
+      line.className = 'term-line';
+      line.innerHTML = html;
+      beforeTerminal.appendChild(line);
+      beforeTerminal.scrollTop = beforeTerminal.scrollHeight;
+    }
+
+    function addBlankLine() {
+      addOutputLine('<span class="output"> </span>');
+    }
+
+    async function run() {
+      // Thought: what needs to change
+      await sleep(500);
+      showThought('I need to restyle that button and change its text...');
+
+      await sleep(2500);
+      hideThought();
+      await sleep(500);
+
+      // Start typing the prompt to Claude
+      await typeChars('On the homepage, that\'s ');
+
+      // Pause — need to grab the URL
+      await sleep(400);
+      showThought('What\'s the URL again... let me grab it');
+      await sleep(2000);
+      hideThought();
+
+      // Simulating switch to browser and copying URL
+      await sleep(2500);
+
+      // Back with the URL — type with a typo
+      await typeChars('localhost:3000/dashboard, ', 38);
+      await typeChars('change the colro', 36);
+
+      // Notice the typo, pause
+      await sleep(600);
+      showThought('Wait, typo...');
+      await sleep(800);
+      hideThought();
+
+      // Backspace to fix "colro" → "color"
+      await backspace(5, 55);
+      await sleep(200);
+      await typeChars('color ', 42);
+
+      // Continue
+      await typeChars('of the Get started button ', 36);
+      await typeChars('below the title section to white with ', 36);
+      await typeChars('black text instead and change the text ', 36);
+      await typeChars('to Get a demo now.', 38);
+
+      // Submit — Claude starts processing
+      await sleep(600);
+
+      addOutputLine('<span class="output"> </span>');
+      addBlankLine();
+      addOutputLine('<span class="claude-label">Claude </span><span class="claude-text">I\'ll update the button styles and text.</span>');
+      await sleep(1200);
+
+      addBlankLine();
+      addOutputLine('<span class="claude-text">  Reading </span><span class="claude-file">src/app/page.tsx</span><span class="claude-text">...</span>');
+      await sleep(1800);
+
+      addOutputLine('<span class="claude-text">  Editing </span><span class="claude-file">src/app/page.tsx</span><span class="claude-text">...</span>');
+      await sleep(1400);
+
+      addOutputLine('<span class="claude-text">  Reading </span><span class="claude-file">src/app/globals.css</span><span class="claude-text">...</span>');
+      await sleep(1600);
+
+      addOutputLine('<span class="claude-text">  Editing </span><span class="claude-file">src/app/globals.css</span><span class="claude-text">...</span>');
+      await sleep(1200);
+
+      addBlankLine();
+      addOutputLine('<span class="claude-check">  \u2713</span><span class="claude-text"> Updated button text to "Get a demo now"</span>');
+      addOutputLine('<span class="claude-check">  \u2713</span><span class="claude-text"> Changed background to white, text to black</span>');
+
+      // Done
+      await sleep(300);
+      clearInterval(timerInterval);
+      var totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+      beforeTimer.textContent = totalTime + 's';
+      beforeTimeBar.style.transition = 'width 0.3s';
+      beforeTimeBar.style.width = '100%';
+      beforeRunning = false;
+      beforePlay.style.display = '';
+    }
+
+    run();
+  }
+
+  beforePlay.addEventListener('click', runBeforeDemo);
+
+  // ── AFTER demo ──
+
+  var afterPlay = document.getElementById('after-play');
+  var afterTimeBar = document.getElementById('after-time');
+  var afterTimer = document.getElementById('after-timer');
+  var chiselHighlight = document.getElementById('chisel-highlight');
+  var chiselPanel = document.getElementById('chisel-panel');
+  var chiselTranscript = document.getElementById('chisel-transcript');
+  var chiselMic = document.getElementById('chisel-mic');
+  var chiselSend = document.getElementById('chisel-send');
+  var afterCursor = document.getElementById('after-cursor');
+  var afterRunning = false;
+
+  var voiceText = 'Change the color to white with black text and change the text to Get a demo now';
+
+  function runAfterDemo() {
+    if (afterRunning) return;
+    afterRunning = true;
+    afterPlay.style.display = 'none';
+
+    chiselHighlight.classList.remove('visible');
+    chiselPanel.classList.remove('visible');
+    chiselTranscript.textContent = '';
+    chiselSend.style.background = '';
+    chiselSend.style.color = '';
+    chiselSend.textContent = 'Send to Claude';
+    chiselMic.innerHTML = '<div class="chisel-sim-mic-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg></div><span>Listening...</span>';
+    // Reset fake button
+    var btn = document.getElementById('fake-cta-btn');
+    btn.style.transition = 'none';
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.style.borderColor = '';
+    btn.textContent = 'Get Started';
+
+    // Reset cursor
+    afterCursor.style.opacity = '0';
+    afterCursor.style.transition = 'none';
+
+    afterTimeBar.style.transition = 'none';
+    afterTimeBar.style.width = '0';
+    afterTimer.textContent = '0.0s';
+
+    var startTime = Date.now();
+    var EXPECTED_DURATION = 10100;
+
+    // Live timer + progress bar
+    var timerInterval = setInterval(function() {
+      var elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+      afterTimer.textContent = elapsed + 's';
+      var pct = Math.min(100, ((Date.now() - startTime) / EXPECTED_DURATION) * 100);
+      afterTimeBar.style.width = pct + '%';
+    }, 100);
+
+    // Cursor appears at top-right of browser body
+    setTimeout(function() {
+      var body = document.getElementById('after-browser');
+      var ar = body.getBoundingClientRect();
+      afterCursor.style.transition = 'none';
+      afterCursor.style.left = (ar.width - 40) + 'px';
+      afterCursor.style.top = '30px';
+      afterCursor.style.opacity = '1';
+    }, 300);
+
+    // Cursor moves toward the button
+    setTimeout(function() {
+      var btn = document.getElementById('fake-cta-btn');
+      var body = document.getElementById('after-browser');
+      var br = btn.getBoundingClientRect();
+      var ar = body.getBoundingClientRect();
+      afterCursor.style.transition = 'left 0.6s ease, top 0.6s ease';
+      afterCursor.style.left = (br.left - ar.left + br.width * 0.5) + 'px';
+      afterCursor.style.top = (br.top - ar.top + br.height * 0.5) + 'px';
+    }, 600);
+
+    // Highlight appears (click) + cursor fades
+    setTimeout(function() {
+      var btn = document.getElementById('fake-cta-btn');
+      var body = document.getElementById('after-browser');
+      var br = btn.getBoundingClientRect();
+      var ar = body.getBoundingClientRect();
+      chiselHighlight.style.top = (br.top - ar.top) + 'px';
+      chiselHighlight.style.left = (br.left - ar.left) + 'px';
+      chiselHighlight.style.width = br.width + 'px';
+      chiselHighlight.style.height = br.height + 'px';
+      chiselHighlight.classList.add('visible');
+      afterCursor.style.transition = 'opacity 0.3s';
+      afterCursor.style.opacity = '0';
+    }, 1400);
+
+    // Panel appears
+    setTimeout(function() { chiselPanel.classList.add('visible'); }, 2000);
+
+    // Voice transcription
+    setTimeout(function() {
+      var words = voiceText.split(' ');
+      var w = 0;
+      function addWord() {
+        if (w >= words.length) return;
+        chiselTranscript.textContent += (w > 0 ? ' ' : '') + words[w];
+        w++;
+        setTimeout(addWord, 170);
+      }
+      addWord();
+    }, 2600);
+
+    // Send
+    setTimeout(function() {
+      chiselSend.style.background = '#ccc';
+      chiselSend.style.color = '#000';
+      chiselSend.textContent = 'Sent!';
+      chiselMic.innerHTML = '<span style="color:var(--text-secondary);font-size:9px;">&#10003; Delivered to Claude Code</span>';
+      chiselHighlight.classList.remove('visible');
+    }, 5400);
+
+    // Panel fades after send
+    setTimeout(function() {
+      chiselPanel.classList.remove('visible');
+    }, 6200);
+
+    // Button updates after Claude processes
+    setTimeout(function() {
+      var btn = document.getElementById('fake-cta-btn');
+      btn.style.transition = 'all 0.4s';
+      btn.style.background = '#fff';
+      btn.style.color = '#000';
+      btn.style.borderColor = '#fff';
+      btn.textContent = 'Get a demo now';
+    }, 9100);
+
+    // Stop timer
+    setTimeout(function() {
+      clearInterval(timerInterval);
+      var totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+      afterTimer.textContent = totalTime + 's';
+      afterTimeBar.style.transition = 'width 0.3s';
+      afterTimeBar.style.width = '100%';
+      afterRunning = false;
+      afterPlay.style.display = '';
+    }, 10100);
+  }
+
+  afterPlay.addEventListener('click', runAfterDemo);
+
+  // ── Copy to clipboard ──
+
+  document.querySelector('.hero-install').addEventListener('click', function() {
+    var hint = this.querySelector('.copy-hint');
+    var original = hint.textContent;
+    hint.textContent = 'copied!';
+    hint.style.color = 'var(--text-secondary)';
+    setTimeout(function() {
+      hint.textContent = original;
+      hint.style.color = '';
+    }, 2000);
+  });
+})();
+</script>
+
+</body>
+</html>
