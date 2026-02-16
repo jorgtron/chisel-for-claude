@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Visually select any element on a webpage and send design instructions to Claude Code",
   "bin": {
-    "chisel": "./bin/cli.js"
+    "chisel": "bin/cli.js"
   },
   "main": "lib/server.js",
   "files": [
@@ -27,6 +27,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jorgtron/chisel-for-claude"
+    "url": "git+https://github.com/jorgtron/chisel-for-claude.git"
   }
 }
